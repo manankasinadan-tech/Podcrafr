@@ -1,0 +1,6 @@
+{
+  "name": "PodCraft AI",
+  "description": "Studio podcast multi-voix IA : transforme vos scripts texte ou PDF en podcasts audio ultra-réalistes avec 6 voix Gemini, émotions et réactions humaines.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
