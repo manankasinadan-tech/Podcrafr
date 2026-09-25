@@ -1,0 +1,38 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch: # Permet de lancer la génération manuellement en 1 clic sur GitHub
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Configuration de Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Configuration du cache Gradle
+        uses: actions/setup-gradle@v3
+
+      - name: Autoriser l'exécution de gradlew
+        run: chmod +x gradlew || true
+
+      - name: Compiler l'APK Android (Debug)
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Téléverser l'APK en tant qu'Artéfact téléchargeable
+        uses: actions/upload-artifact@v4
+        with:
+          name: PodCraft-AI-APK
+          path: app/build/outputs/apk/debug/*.apk
+          retention-days: 14
