@@ -5,7 +5,7 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
-  workflow_dispatch: # Permet de lancer la génération manuellement en 1 clic sur GitHub
+  workflow_dispatch: # Déclenchement manuel en 1 clic depuis l'onglet Actions
 
 jobs:
   build:
@@ -21,14 +21,27 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Configuration du cache Gradle
-        uses: actions/setup-gradle@v3
+      - name: Préparer l'environnement
+        run: |
+          if [ -f ".env.example" ] && [ ! -f ".env" ]; then
+            cp .env.example .env
+          fi
 
-      - name: Autoriser l'exécution de gradlew
-        run: chmod +x gradlew || true
+      - name: Valider le Wrapper Gradle
+        run: |
+          if [ ! -f "gradlew" ]; then
+            echo "gradlew introuvable, génération du wrapper Gradle..."
+            gradle wrapper --gradle-version 9.3.1 || true
+          fi
+          chmod +x gradlew || true
 
       - name: Compiler l'APK Android (Debug)
-        run: ./gradlew assembleDebug --stacktrace
+        run: |
+          if [ -f "./gradlew" ]; then
+            ./gradlew assembleDebug --no-daemon --stacktrace
+          else
+            gradle assembleDebug --no-daemon --stacktrace
+          fi
 
       - name: Téléverser l'APK en tant qu'Artéfact téléchargeable
         uses: actions/upload-artifact@v4
